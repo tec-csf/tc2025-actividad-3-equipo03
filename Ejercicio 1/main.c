@@ -10,6 +10,7 @@
 
 #define quantum 4
 
+/* Structure Definiton */
 typedef struct Processes
     {
         int id;
@@ -27,22 +28,29 @@ typedef struct Gangs
 
 
 
+/* Declaration of Functions */
 
 Gang * createGang(int id, int num, Process * queue);
-Process * createProcess(int time, int id);
-void execute_process(Process * p);
-void enqueue_gang(Gang * toAdd);
-void enqueue_process(Process * toAdd, Process * first_process);
-Process * dequeue_process(Process * first_process);
-Gang * dequeue_gang();
 
+Process * createProcess(int time, int id);
+
+void executeProcess(Process * p);
+
+void enqueueGang(Gang * toAdd);
+
+void enqueueProcess(Process * toAdd, Process * first_process);
+
+Process * dequeueProcess(Process * first_process);
+
+Gang * dequeueGang();
+
+
+/* Declaration of begining of Gang queue and counter */
 Gang * first;
-int count;
 
 int main(int argc, const char * argv[])
     {
-        //Initialize Variables
-        count = 0;
+        /* Variable Initializing */
         int process_counter = 0;
         int num_procesos = 0;
         int tiempo_proceso = 0;
@@ -51,7 +59,10 @@ int main(int argc, const char * argv[])
         int num_gang = 0;
         int i = 0;
 
-        //Get all inputs from user 
+        /* Generate Random Numbers */
+        srand((int) time(NULL));
+
+        /* Get user input */
         printf("Ingrese el número total de procesos a planificar: ");
         scanf("%d", &num_procesos);
 
@@ -61,51 +72,52 @@ int main(int argc, const char * argv[])
         printf("Ingrese el número de pandillas (gangs): ");
         scanf("%d", &num_gang);
 
-        //Gang Creation 
-        for(;i<num_gang; i++){
+        /* Gang creation */
+        for(;i<num_gang; i++)
+        {
 
             printf("Ingrese el número de procesos para el gang %d \n", i);
             scanf("%d", &proceso_gang);
-            Process * first = NULL;
-
-            for(int j=0; j<proceso_gang; j++){
-                printf("Ingrese el tiempo del proceso %d: \n", j);
-                scanf("%d", &tiempo_proceso);
+            Process * first;
+            
+            for(int j=0; j<proceso_gang; j++)
+            {
+                tiempo_proceso = rand() % 10;
                 Process * temp = createProcess(tiempo_proceso, j);
-                enqueue_process(temp, first);
+                enqueueProcess(temp, first);
                 process_counter++;
             }
 
             Gang * new_gang = createGang(i, proceso_gang, first);
-            enqueue_gang(new_gang);
+            enqueueGang(new_gang);
             printf("Gang creada \n");
         }
         
 
-        //Gang Execution
+        /* Gang Execution  */
         Gang * in_execution;
-        
-        
+
         while( num_gang > 0)
         {
 
-            //Get first gang in queue
-            in_execution = dequeue_gang();
+             /* Get first queue in gang */
+            in_execution = dequeueGang();
             int num_process_gang = in_execution->num;
+
             printf(" EJECUTANDO GANG %d \n", in_execution->id);
 
-            //Each CPU should execute a single process the quantum assigned time. 
+            /* Get first queue in gang */
             for(i=0; i<num_cpu; i++)
             {
                 if(num_process_gang != 0)
                 {
-                    Process * temp = dequeue_process(in_execution->first);
+                    Process * temp = dequeueProcess(in_execution->first);
                     printf(" EJECUTANDO PROCESO %d DE TIEMPO %d \n", temp->id, temp->time);
-                    execute_process(temp);
+                    executeProcess(temp);
 
                     if(temp->time > 0)
                     {
-                    enqueue_process(temp, in_execution->first);
+                    enqueueProcess(temp, in_execution->first);
                     printf(" Formando de nuevo: NO TERMINO PROCESO %d FALTA TIEMPO %d \n", temp->id, temp->time);
 
                     }else
@@ -119,7 +131,7 @@ int main(int argc, const char * argv[])
             
             if(in_execution->first != NULL)
             {
-                enqueue_gang(in_execution);
+                enqueueGang(in_execution);
             }else
             {
                 free(in_execution);
@@ -128,6 +140,17 @@ int main(int argc, const char * argv[])
         }
         
     }
+
+/*
+ * Function: createGang
+ * --------------------
+ *  
+ *  id (int): gang id
+ *  num (int): number of process in gang
+ *  queue (Proceess *): process queue to be executed
+ * 
+ *  returns: created gang
+ */
 
     Gang * createGang(int id, int num, Process * queue)
     {
@@ -139,6 +162,15 @@ int main(int argc, const char * argv[])
         return new;
     }
 
+/*
+ * Function: createProcess
+ * --------------------
+ *  
+ *  id (int): gang id
+ *  time (int): time it takes to execute process
+ *  returns (Process *): created proces
+ */
+
     Process * createProcess(int time, int id)
     {
         Process * new = (Process *)malloc(sizeof(Process));
@@ -147,12 +179,25 @@ int main(int argc, const char * argv[])
         return new;
     }
 
-    void execute_process(Process * p)
+/*
+ * Function: executeProcess
+ * --------------------
+ *  p (Process *): process to be executed
+ */
+
+    void executeProcess(Process * p)
     {
     p->time -= quantum;
     }
 
-    void enqueue_gang(Gang * toAdd)
+/*
+ * Function: enqueueGang
+ * --------------------
+ *  
+ *  toAdd (Gang *):  Gang to be added to queue
+ */
+
+    void enqueueGang(Gang * toAdd)
     {
         if(first==NULL)
         {
@@ -166,16 +211,23 @@ int main(int argc, const char * argv[])
             }
             temp->next=toAdd;
         }
-        count++;
     }
 
-void enqueue_process(Process * toAdd, Process * first_process){
-	if(first_process==NULL)
+/*
+ * Function: enqueueProcess
+ * --------------------
+ *  
+ *  firstProcess (Process *): start of queue 
+ *  toAdd (Process *): process to be added to queue
+ */
+
+void enqueueProcess(Process * toAdd, Process * firstProcess){
+	if(firstProcess==NULL)
     {
-		first_process=toAdd;
+		firstProcess=toAdd;
 	}else
     {
-		Process * temp = first_process;
+		Process * temp = firstProcess;
 		while(temp->next!=NULL)
         {
 			temp=temp->next;
@@ -184,19 +236,32 @@ void enqueue_process(Process * toAdd, Process * first_process){
 	}
 }
 
-Process * dequeue_process(Process * first_process)
+/*
+ * Function: dequeueProcess
+ * --------------------
+ *  
+ *  firstProcess (Process *): pointer to start of queue
+ *  returns (Process *): process that has been dequeued
+ */
+
+Process * dequeueProcess(Process * firstProcess)
 {
-	Process *toReturn = first_process;
-	first_process = first_process->next;
+	Process *toReturn = firstProcess;
+	firstProcess = firstProcess->next;
 	toReturn->next=NULL;
 	return toReturn;
 }
 
-Gang * dequeue_gang()
+/*
+ * Function: dequeueGang
+ * --------------------
+ *  
+ *  returns (Gang *): Gang that was just dequeued
+ */
+
+Gang * dequeueGang()
 {
 	Gang *toReturn = first;
-	first = first->next;
-	count--;
 	toReturn->next=NULL;
 	return toReturn;
 }
