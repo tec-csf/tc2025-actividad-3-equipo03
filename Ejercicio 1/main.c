@@ -101,7 +101,7 @@ int main(int argc, const char * argv[])
                 {
                     Process * temp = dequeue_process(in_execution->first);
                     printf(" EJECUTANDO PROCESO %d DE TIEMPO %d \n", temp->id, temp->time);
-                    execute_process(temp, quantum);
+                    execute_process(temp);
 
                     if(temp->time > 0)
                     {
