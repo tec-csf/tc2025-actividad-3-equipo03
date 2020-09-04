@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 #define quantum 4
 
@@ -289,9 +290,8 @@ Gang * dequeueGang()
 void printProcess(Process * firstProcess)
 {
     Process *temp = firstProcess;
-    printf(" PRINTING PROCESS QUEUE \n");
 	while(temp!=NULL){
-			printf("process id:%d, time:%d \n",temp->id, temp->time);
+			printf("id proceso: %d, tiempo que necesita para ejecucutarse: %d \n",temp->id, temp->time);
 			temp=temp->next;
 	}
 	printf("\n");
