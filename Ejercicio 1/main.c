@@ -60,6 +60,7 @@ int main(int argc, const char * argv[])
         int numCpu = 0;
         int numGang = 0;
         int i = 0;
+        int j = 0;
 
         /* Generate Random Numbers */
         srand((int) time(NULL));
@@ -81,15 +82,20 @@ int main(int argc, const char * argv[])
             printf("Ingrese el número de procesos para el gang %d \n", i);
             scanf("%d", &procesoGang);
 
-            if(processCounter+procesoGang > numProcesos){
-                printf("No puede designar esta cantidad a este gang ya que solo quedan %d procesos, ingresa una cantidad menor \n", numProcesos-processCounter+1);
+            /* Validate if amount of process per gang is valid */
+            while(procesoGang>numProcesos){
+                printf("ERROR: No puede designar esta cantidad a este gang ya que es mayor a la cantidad de procesos disponibles: %d, ingresa una cantidad menor \n", numProcesos);
+                scanf("%d", &procesoGang);
+            }
+            while(processCounter+procesoGang > numProcesos){
+                printf("ERROR: No puede designar esta cantidad a este gang ya que solo quedan %d proceso(s), ingresa una cantidad menor \n", numProcesos-(processCounter));
                 scanf("%d", &procesoGang);
             }
 
             Process * firstProcess = NULL;
             Gang * newGang = createGang(i, procesoGang, firstProcess);
 
-            for(int j=0; j<procesoGang; j++)
+            for(j=0; j<procesoGang; j++)
             {
                 tiempoProceso =(rand() %  10) + 1;
                 Process * temp = createProcess(tiempoProceso, processCounter);
@@ -155,7 +161,7 @@ int main(int argc, const char * argv[])
             }
             printf("\n");
         }
-        
+        return 0;
     }
 
 /*
