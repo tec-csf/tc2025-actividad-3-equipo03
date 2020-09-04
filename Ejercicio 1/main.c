@@ -48,17 +48,16 @@ void printProcess(Process * firstProcess);
 
 /* Declaration of begining of Gang queue and counter */
 Gang * first;
-Process * firstProcess;
 
 int main(int argc, const char * argv[])
     {
         /* Variable Initializing */
-        int process_counter = 0;
-        int num_procesos = 0;
-        int tiempo_proceso = 0;
-        int proceso_gang = 0;
-        int num_cpu = 0;
-        int num_gang = 0;
+        int processCounter = 0;
+        int numProcesos = 0;
+        int tiempoProceso = 0;
+        int procesoGang = 0;
+        int numCpu = 0;
+        int numGang = 0;
         int i = 0;
 
         /* Generate Random Numbers */
@@ -66,35 +65,35 @@ int main(int argc, const char * argv[])
 
         /* Get user input */
         printf("Ingrese el número de procesos: \n ");
-        scanf("%d", &num_procesos);
+        scanf("%d", &numProcesos);
 
         printf("Ingrese el número de procesadores: \n");
-        scanf("%d", &num_cpu);
+        scanf("%d", &numCpu);
 
         printf("Ingrese el número de pandillas (gangs): \n");
-        scanf("%d", &num_gang);
+        scanf("%d", &numGang);
 
         /* Gang creation */
-        for(;i<num_gang; i++)
+        for(;i<numGang; i++)
         {
 
             printf("Ingrese el número de procesos para el gang %d \n", i);
-            scanf("%d", &proceso_gang);
+            scanf("%d", &procesoGang);
 
-            if(process_counter+proceso_gang > num_procesos){
-                printf("No puede designar esta cantidad a este gang ya que solo quedan %d procesos, ingresa una cantidad menor \n", num_procesos-process_counter+1);
-                scanf("%d", &proceso_gang);
+            if(processCounter+procesoGang > numProcesos){
+                printf("No puede designar esta cantidad a este gang ya que solo quedan %d procesos, ingresa una cantidad menor \n", numProcesos-processCounter+1);
+                scanf("%d", &procesoGang);
             }
 
-            firstProcess = NULL;
-            Gang * newGang = createGang(i, proceso_gang, firstProcess);
+            Process * firstProcess = NULL;
+            Gang * newGang = createGang(i, procesoGang, firstProcess);
 
-            for(int j=0; j<proceso_gang; j++)
+            for(int j=0; j<procesoGang; j++)
             {
-                tiempo_proceso =(rand() %  10) + 1;
-                Process * temp = createProcess(tiempo_proceso, process_counter);
+                tiempoProceso =(rand() %  10) + 1;
+                Process * temp = createProcess(tiempoProceso, processCounter);
                 enqueueProcess(temp, newGang);
-                process_counter++;
+                processCounter++;
             }
 
             enqueueGang(newGang);
@@ -102,8 +101,10 @@ int main(int argc, const char * argv[])
             printProcess(newGang->firstProcess);
         }
 
-        if(num_procesos>process_counter+1){
-            printf("ERROR: %d procesos no tienen gang, vuelva a intentarlo\n", num_procesos-(process_counter+1));
+        /* Validating all process are asigned to a gang*/
+        if(numProcesos>processCounter+1)
+        {
+            printf("ERROR: %d procesos no tienen gang, vuelva a intentarlo\n", numProcesos-(processCounter+1));
             return 0;
         }
         
@@ -111,7 +112,7 @@ int main(int argc, const char * argv[])
         /* Gang Execution  */
         Gang * in_execution;
 
-        while( num_gang > 0)
+        while( numGang > 0)
         {
 
              /* Get first queue in gang */
@@ -121,7 +122,7 @@ int main(int argc, const char * argv[])
             printf(" --> Ejecución de pandilla número %d \n", in_execution->id);
 
             /* Get first queue in gang */
-            for(i=0; i<num_cpu; i++)
+            for(i=0; i<numCpu; i++)
             {
                 if(num_process_gang != 0)
                 {
@@ -149,7 +150,7 @@ int main(int argc, const char * argv[])
             }else
             {
                 free(in_execution);
-                num_gang--;
+                numGang--;
             }
             printf("\n");
         }
@@ -235,7 +236,7 @@ int main(int argc, const char * argv[])
  * Function: enqueueProcess
  * --------------------
  *  
- *  firstProcess (Process *): start of queue 
+ *  g (Gang *): Gang to add process 
  *  toAdd (Process *): process to be added to queue
  */
 
@@ -258,7 +259,7 @@ void enqueueProcess(Process * toAdd, Gang * g){
  * Function: dequeueProcess
  * --------------------
  *  
- *  firstProcess (Process *): pointer to start of queue
+ *  g (Gang *): Gang to add process 
  *  returns (Process *): process that has been dequeued
  */
 
